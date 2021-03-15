@@ -26,10 +26,10 @@ public:
 	void removePictureFromAlbumByName(const std::string& albumName, const std::string& pictureName) override;
 	void tagUserInPicture(const std::string& albumName, const std::string& pictureName, int userId) override;
 	void untagUserInPicture(const std::string& albumName, const std::string& pictureName, int userId) override;
-
 	// user related
 	void printUsers() override;
 	void createUser(User& user) override;
+
 	void deleteUser(const User& user) override;
 	bool doesUserExists(int userId) override;
 	User getUser(int userId) override;
@@ -39,7 +39,6 @@ public:
     int countAlbumsTaggedOfUser(const User& user) override;
 	int countTagsOfUser(const User& user) override;
 	float averageTagsPerAlbumOfUser(const User& user) override;
-
 	// queries
 	User getTopTaggedUser() override;
 	Picture getTopTaggedPicture() override;
