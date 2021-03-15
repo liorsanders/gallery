@@ -62,7 +62,7 @@ int main(void)
 	MemoryAccess dataAccess;
 
 	// initialize album manager
-	AlbumManager albumManager(dataAccess);
+	AlbumManager* albumManager = new AlbumManager(dataAccess); /*turned albumManager into pointer to make changes by refference*/
 
 	//todo first issue needs to be fixed here
 
@@ -81,12 +81,13 @@ int main(void)
 		int commandNumber = getCommandNumberFromUser();
 		
 		try	{
-			albumManager.executeCommand(static_cast<CommandType>(commandNumber));
+			albumManager->executeCommand(static_cast<CommandType>(commandNumber));
 		} catch (std::exception& e) {	
 			std::cout << e.what() << std::endl;
 		}
 	} 
 	while (true);
+
+	delete albumManager;
+	return 0;
 }
-
-

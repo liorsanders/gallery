@@ -299,6 +299,9 @@ void AlbumManager::addUser()
 void AlbumManager::removeUser()
 {
 	// get user name
+
+
+	//todo fix this function to remove user completely
 	std::string userIdStr = getInputFromConsole("Enter user id: ");
 	int userId = std::stoi(userIdStr);
 	if ( !m_dataAccess.doesUserExists(userId) ) {
@@ -307,6 +310,18 @@ void AlbumManager::removeUser()
 	const User& user = m_dataAccess.getUser(userId);
 	if (isCurrentAlbumSet() && userId == m_openAlbum.getOwnerId()) {
 		closeAlbum();
+	}
+	//added these lines:
+
+	//remove user albums
+	for (auto& album : this->m_dataAccess.getAlbumsOfUser(user)) {
+		this->m_dataAccess.deleteAlbum(album.getName(), album.getOwnerId());
+	}
+	//remove users tag from pictures
+	for (auto& album : this->m_dataAccess.getAlbums()) {
+		for (auto& picture : album.getPictures()) {
+			this->m_dataAccess.untagUserInPicture(album.getName(), picture.getName(), user.getId()); //if user is not tagged the function to untag will ignore.
+		}
 	}
 
 	m_dataAccess.deleteUser(user);
