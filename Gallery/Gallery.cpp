@@ -2,7 +2,7 @@
 #include <string>
 #include "MemoryAccess.h"
 #include "AlbumManager.h"
-#include<Windows.h>
+#include <Windows.h>
 
 using std::cout;
 using std::endl;
