@@ -22,6 +22,12 @@ bool DatabaseAccess::open()
 	return true;
 }
 
+void DatabaseAccess::close()
+{
+	sqlite3_close(_db);
+	_db = nullptr;
+}
+
 void DatabaseAccess::init_db()
 {
 	std::stringstream statement;
