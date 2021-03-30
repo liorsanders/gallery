@@ -7,6 +7,7 @@ Picture::Picture(int id, const std::string& name):
 	m_pictureId(id), m_name(name), m_pathOnDisk(""), m_creationDate("")
 {
 	setCreationDateNow();
+	
 }
 
 Picture::Picture(int id, const std::string& name, const std::string& pathOnDisk, const std::string& creationDate)

@@ -2,6 +2,7 @@
 #include <string>
 #include "MemoryAccess.h"
 #include "AlbumManager.h"
+#include "DataBaseAccess.h"
 #include <Windows.h>
 
 using std::cout;
@@ -59,7 +60,7 @@ int getCommandNumberFromUser()
 int main(void)
 {
 	// initialization data access
-	MemoryAccess dataAccess;
+	DatabaseAccess dataAccess;
 
 	// initialize album manager
 	AlbumManager* albumManager = new AlbumManager(dataAccess); /*turned albumManager into pointer to make changes by refference*/
