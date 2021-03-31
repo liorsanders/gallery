@@ -5,7 +5,7 @@
 class User
 {
 public:
-	
+	User() {}
 	User(int id, const std::string& name);
 
 	int getId() const;

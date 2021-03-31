@@ -1,5 +1,60 @@
 #include "DataBaseAccess.h"
 
+std::list<Album> albums; //get cleared before every query
+std::list<User> users;
+std::list<Picture> pictures;
+
+int albums_callback(void* data, int argc, char** argv, char** azColName)
+{
+	Album album;
+	for (int i = 0; i < argc; i++) {
+		if (std::string(azColName[i]) == album_field::CREATION_DATE) {
+			album.setCreationDate(argv[i]);
+		}
+		else if (std::string(azColName[i]) == album_field::NAME) {
+			album.setName(argv[i]);
+		}
+		else if (std::string(azColName[i]) == album_field::USER_ID) {
+			album.setOwner(std::stoi(argv[i]));
+		}
+	}
+	albums.push_back(album);
+	return 0;
+}
+
+int users_callback(void* data, int argc, char** argv, char** azColName)
+{
+	User user;
+	for (int i = 0; i < argc; i++) {
+		if (std::string(azColName[i]) == user_field::ID) {
+			user.setId(std::stoi(argv[i]));
+		}
+		else if (std::string(azColName[i]) == user_field::NAME) {
+			user.setName(argv[i]);
+		}
+	}
+	users.push_back(user);
+	return 0;
+}
+
+int pictures_callback(void* data, int argc, char** argv, char** azColName)
+{
+	Picture pic;
+	for (int i = 0; i < argc; i++) {
+		if (std::string(azColName[i]) == picture_field::ID) {
+			pic.setId(std::stoi(argv[i]));
+		}
+		else if (std::string(azColName[i]) == picture_field::CREATION_DATE) {
+			pic.setCreationDate(argv[i]);
+		}
+		else if (std::string(azColName[i]) == picture_field::NAME) {
+			pic.setName(argv[i]);
+		}
+	}
+	pictures.push_back(pic);
+	return 0;
+}
+
 bool DatabaseAccess::open()
 {
 	int doesFileExist = _access(DB_NAME, 0);
@@ -129,6 +184,12 @@ void DatabaseAccess::deleteUser(const User& user)
 	/*next delete user from users*/
 	statement << "DELETE FROM users WHERE id = " << user.getId() << ";";
 	my_exec(statement.str().c_str());
+}
+
+const std::list<Album> DatabaseAccess::getAlbums()
+{
+	std::list<Album> res;
+	
 }
 
 void DatabaseAccess::deleteAlbum(const std::string& albumName, int userId)
