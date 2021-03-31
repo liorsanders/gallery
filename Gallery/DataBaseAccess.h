@@ -14,7 +14,7 @@ public:
 	const std::list<Album> getAlbumsOfUser(const User& user) override;
 	void createAlbum(const Album& album) override;
 
-	void deleteAlbum(const std::string& albumName, int userId) override; //TODO
+	void deleteAlbum(const std::string& albumName, int userId) override; 
 
 	bool doesAlbumExists(const std::string& albumName, int userId) override;
 	Album openAlbum(const std::string& albumName) override;
@@ -24,7 +24,7 @@ public:
 	void printAlbums() override;
 
 	// picture related
-	void addPictureToAlbumByName(const std::string& albumName, const Picture& picture) override; //TODO
+	void addPictureToAlbumByName(const std::string& albumName, const Picture& picture) override; 
 	void removePictureFromAlbumByName(const std::string& albumName, const std::string& pictureName) override; //TODO
 	void tagUserInPicture(const std::string& albumName, const std::string& pictureName, int userId) override; //TODO
 	void untagUserInPicture(const std::string& albumName, const std::string& pictureName, int userId) override; //TODO

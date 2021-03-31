@@ -51,7 +51,7 @@ void DatabaseAccess::init_db()
 		"ID INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL," <<
 		"NAME TEXT NOT NULL," <<
 		"LOCATION TEXT NOT NULL," <<
-		"CREATION_DATE DATE," <<
+		"CREATION_DATE TEXT NOT NULL," <<
 		"ALBUM_ID INTEGER NULL," <<
 		"FOREIGN KEY(ALBUM_ID) REFERENCES ALBUMS(ID));";
 	my_exec(statement.str().c_str());
@@ -74,6 +74,24 @@ void DatabaseAccess::my_exec(const char* sqlStatement)
 	if (res != SQLITE_OK) {
 		throw std::runtime_error(errMessage);
 	}
+}
+
+void DatabaseAccess::addPictureToAlbumByName(const std::string& albumName, const Picture& picture)
+{
+	//insert into pictures (id, name, location, creation_date, album_id)
+	std::stringstream statement;
+	statement << "INSERT INTO pictures (id, name, location, creation_date, album_id) VALUES (" <<
+		picture.getId() << ", '" << picture.getName() << "', '" << picture.getPath() << "', '" <<
+		picture.getCreationDate() << "', " << "(SELECT id FROM albums where NAME = '" << albumName << "'));";
+	my_exec(statement.str().c_str());
+}
+
+void DatabaseAccess::tagUserInPicture(const std::string& albumName, const std::string& pictureName, int userId)
+{
+	std::stringstream statement;
+	statement << "INSERT INTO tags (picture_id, user_id) VALUES((SELECT id FROM pictures WHERE name = '"
+		<< pictureName << "'), " << userId << ");";
+	my_exec(statement.str().c_str());
 }
 
 void DatabaseAccess::createUser(User& user)
