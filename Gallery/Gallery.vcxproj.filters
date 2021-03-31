@@ -76,9 +76,6 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Gallery.VC.db" />
-  </ItemGroup>
-  <ItemGroup>
     <Text Include="ReadMe.txt">
       <Filter>Resource Files</Filter>
     </Text>

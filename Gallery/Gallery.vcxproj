@@ -107,9 +107,6 @@
     <ClCompile Include="Gallery.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Gallery.VC.db" />
-  </ItemGroup>
-  <ItemGroup>
     <Text Include="ReadMe.txt" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

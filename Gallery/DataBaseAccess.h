@@ -65,13 +65,13 @@ public:
 
 	// user statistics
 	int countAlbumsOwnedOfUser(const User& user) override; 
-	int countAlbumsTaggedOfUser(const User& user) override; //TODO
-	int countTagsOfUser(const User& user) override; //TODO
+	int countAlbumsTaggedOfUser(const User& user) override; 
+	int countTagsOfUser(const User& user) override; 
 	float averageTagsPerAlbumOfUser(const User& user) override; 
 	// queries
-	User getTopTaggedUser() override; //TODO
-	Picture getTopTaggedPicture() override; //TODO
-	std::list<Picture> getTaggedPicturesOfUser(const User& user) override; //TODO
+	User getTopTaggedUser() override; 
+	Picture getTopTaggedPicture() override; 
+	std::list<Picture> getTaggedPicturesOfUser(const User& user) override; 
 
 	bool open() override;
 	void close() override;
@@ -82,6 +82,7 @@ private:
 	void init_db();
 	void my_exec(const char* sqlStatement);
 	void my_exec(const char* sqlStatement, int (*callback)(void*, int, char**, char**));
+	int getNumOfTagsInPic(const int id);
 
 	sqlite3* _db;
 };

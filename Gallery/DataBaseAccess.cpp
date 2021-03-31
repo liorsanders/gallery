@@ -1,4 +1,5 @@
 #include "DataBaseAccess.h"
+#include <map>
 
 std::list<Album> albums; //get cleared before every query
 std::list<User> users;
@@ -50,9 +51,73 @@ int pictures_callback(void* data, int argc, char** argv, char** azColName)
 		else if (std::string(azColName[i]) == picture_field::NAME) {
 			pic.setName(argv[i]);
 		}
+		else if (std::string(azColName[i]) == picture_field::LOCATION) {
+			pic.setPath(argv[i]);
+		}
 	}
 	pictures.push_back(pic);
 	return 0;
+}
+
+int tags_callback(void* data, int argc, char** argv, char** azColName) {
+	Picture pic;
+	User user;
+	for (int i = 0; i < argc; i++) {
+		if (std::string(azColName[i]) == tag_field::PICTURE_ID) {
+			pic.setId(std::stoi(argv[i]));
+		}
+		else if (std::string(azColName[i]) == tag_field::USER_ID) {
+			user.setId(std::stoi(argv[i]));
+		}
+	}
+	users.push_back(user);
+	pictures.push_back(pic);
+	return 0;
+}
+
+Picture DatabaseAccess::getTopTaggedPicture()
+{
+	int currHighest = -1;
+	Picture currHighestPic;
+	pictures.clear();
+	my_exec("SELECT * FROM pictures;", pictures_callback);
+	int count;
+	for (const auto& pic : pictures) {
+		count = getNumOfTagsInPic(pic.getId());
+		if (count > currHighest) {
+			currHighest = count;
+			currHighestPic = pic;
+		}
+	}
+	return currHighestPic;
+}
+
+User DatabaseAccess::getTopTaggedUser()
+{
+	int currHighest = -1;
+	User currHighestUser;
+	users.clear();
+	my_exec("SELECT * FROM users;", users_callback);
+	int count;
+	for (const auto& user : users) {
+		count = countTagsOfUser(user);
+		if (count > currHighest) {
+			currHighest = count;
+			currHighestUser = user;
+		}
+	}
+	return currHighestUser;
+}
+
+
+
+std::list<Picture> DatabaseAccess::getTaggedPicturesOfUser(const User& user)
+{
+	pictures.clear();
+	std::stringstream statement("SELECT * FROM pictures WHERE id IN (SELECT picture_id FROM tags WHERE user_id = ");
+	statement << user.getId() << ");";
+	my_exec(statement.str().c_str(), pictures_callback);
+	return pictures;
 }
 
 bool DatabaseAccess::open()
@@ -124,6 +189,7 @@ void DatabaseAccess::init_db()
 
 void DatabaseAccess::my_exec(const char* sqlStatement)
 {
+	std::cout << "executing: " << sqlStatement << std::endl; //for debuging
 	char* errMessage = nullptr;
 	int res = sqlite3_exec(_db, sqlStatement, nullptr, nullptr, &errMessage);
 	if (res != SQLITE_OK) {
@@ -133,11 +199,20 @@ void DatabaseAccess::my_exec(const char* sqlStatement)
 
 void DatabaseAccess::my_exec(const char* sqlStatement, int(*callback)(void*, int, char**, char**))
 {
+	std::cout << "executing " << sqlStatement << std::endl; //for debuging
 	char* errMessage = nullptr;
 	int res = sqlite3_exec(_db, sqlStatement, callback, nullptr, &errMessage);
 	if (res != SQLITE_OK) {
 		throw std::runtime_error(errMessage);
 	}
+}
+
+int DatabaseAccess::getNumOfTagsInPic(const int id)
+{
+	pictures.clear();
+	std::stringstream statement("SELECT picture_id FROM tags WHERE id = ");
+	statement << id << ";";
+	return pictures.size();
 }
 
 void DatabaseAccess::printAlbums()
@@ -249,12 +324,30 @@ int DatabaseAccess::countAlbumsOwnedOfUser(const User& user)
 
 int DatabaseAccess::countAlbumsTaggedOfUser(const User& user)
 {
-	//TODO
+	int res = 0; bool flag = false;
+	pictures.clear();
+	std::stringstream statement("SELECT picture_id FROM tags WHERE user_id = ");
+	statement << user.getId() << ";";
+	my_exec(statement.str().c_str(), tags_callback);
+	for (const auto& album : getAlbums()) {
+		//go over pictures that user is tagged in
+		for (const auto& pic : pictures) {
+			if (album.doesPictureExists(pic.getName()) && !flag) {
+				flag = true;
+				res++;
+			}
+		}
+		flag = false;
+	}
+	return res;
 }
 
 int DatabaseAccess::countTagsOfUser(const User& user)
 {
-	//TODO
+	users.clear();
+	std::stringstream statement("SELECT user_id FROM tags WHERE user_id = ");
+	statement << user.getId() << ";";
+	return users.size();
 }
 
 const std::list<Album> DatabaseAccess::getAlbums()
