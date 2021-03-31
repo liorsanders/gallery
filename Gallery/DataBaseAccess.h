@@ -8,31 +8,31 @@
 
 constexpr auto DB_NAME = "galleryDB.sqlite";
 
-namespace album_field {
-	auto ID = "ID";
-	auto NAME = "NAME";
-	auto CREATION_DATE = "CREATION_DATE";
-	auto USER_ID = "USER_ID";
-};
-
-namespace user_field {
-	auto ID = "ID";
-	auto NAME = "NAME";
-};
-
-namespace tag_field {
-	auto ID = "ID";
-	auto PICTURE_ID = "PICTURE_ID";
-	auto USER_ID = "USER_ID";
-};
-
-namespace picture_field {
-	auto ID = "ID";
-	auto NAME = "NAME";
-	auto LOCATION = "LOCATION";
-	auto CREATION_DATE = "CREATION_DATE";
-	auto ALBUM_ID = "ALBUM_ID";
-};
+//namespace album_field {
+//	auto ID = "ID";
+//	auto NAME = "NAME";
+//	auto CREATION_DATE = "CREATION_DATE";
+//	auto USER_ID = "USER_ID";
+//};
+//
+//namespace user_field {
+//	auto ID = "ID";
+//	auto NAME = "NAME";
+//};
+//
+//namespace tag_field {
+//	auto ID = "ID";
+//	auto PICTURE_ID = "PICTURE_ID";
+//	auto USER_ID = "USER_ID";
+//};
+//
+//namespace picture_field {
+//	auto ID = "ID";
+//	auto NAME = "NAME";
+//	auto LOCATION = "LOCATION";
+//	auto CREATION_DATE = "CREATION_DATE";
+//	auto ALBUM_ID = "ALBUM_ID";
+//};
 
 class DatabaseAccess : public IDataAccess {
 public:
@@ -67,7 +67,9 @@ public:
 	int countAlbumsOwnedOfUser(const User& user) override; 
 	int countAlbumsTaggedOfUser(const User& user) override; 
 	int countTagsOfUser(const User& user) override; 
-	float averageTagsPerAlbumOfUser(const User& user) override; 
+	float averageTagsPerAlbumOfUser(const User& user) override {
+		return 0.0f;
+	}
 	// queries
 	User getTopTaggedUser() override; 
 	Picture getTopTaggedPicture() override; 

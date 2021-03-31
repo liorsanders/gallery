@@ -10,16 +10,16 @@ int albums_callback(void* data, int argc, char** argv, char** azColName)
 {
 	Album album;
 	for (int i = 0; i < argc; i++) {
-		if (std::string(azColName[i]) == album_field::CREATION_DATE) {
+		if (std::string(azColName[i]) == "CREATION_DATE") {
 			album.setCreationDate(argv[i]);
 		}
-		else if (std::string(azColName[i]) == album_field::NAME) {
+		else if (std::string(azColName[i]) == "NAME") {
 			album.setName(argv[i]);
 		}
-		else if (std::string(azColName[i]) == album_field::USER_ID) {
+		else if (std::string(azColName[i]) == "USER_ID") {
 			album.setOwner(std::stoi(argv[i]));
 		}
-		else if (std::string(azColName[i]) == album_field::ID) {
+		else if (std::string(azColName[i]) == "ID") {
 			album.setId(std::stoi(argv[i]));
 		}
 	}
@@ -31,10 +31,10 @@ int users_callback(void* data, int argc, char** argv, char** azColName)
 {
 	User user;
 	for (int i = 0; i < argc; i++) {
-		if (std::string(azColName[i]) == user_field::ID) {
+		if (std::string(azColName[i]) == "ID") {
 			user.setId(std::stoi(argv[i]));
 		}
-		else if (std::string(azColName[i]) == user_field::NAME) {
+		else if (std::string(azColName[i]) == "NAME") {
 			user.setName(argv[i]);
 		}
 	}
@@ -46,16 +46,16 @@ int pictures_callback(void* data, int argc, char** argv, char** azColName)
 {
 	Picture pic;
 	for (int i = 0; i < argc; i++) {
-		if (std::string(azColName[i]) == picture_field::ID) {
+		if (std::string(azColName[i]) == "ID") {
 			pic.setId(std::stoi(argv[i]));
 		}
-		else if (std::string(azColName[i]) == picture_field::CREATION_DATE) {
+		else if (std::string(azColName[i]) == "CREATION_DATE") {
 			pic.setCreationDate(argv[i]);
 		}
-		else if (std::string(azColName[i]) == picture_field::NAME) {
+		else if (std::string(azColName[i]) == "NAME") {
 			pic.setName(argv[i]);
 		}
-		else if (std::string(azColName[i]) == picture_field::LOCATION) {
+		else if (std::string(azColName[i]) == "LOCATION") {
 			pic.setPath(argv[i]);
 		}
 		
@@ -68,10 +68,10 @@ int tags_callback(void* data, int argc, char** argv, char** azColName) {
 	Picture pic;
 	User user;
 	for (int i = 0; i < argc; i++) {
-		if (std::string(azColName[i]) == tag_field::PICTURE_ID) {
+		if (std::string(azColName[i]) == "PICTURE_ID") {
 			pic.setId(std::stoi(argv[i]));
 		}
-		else if (std::string(azColName[i]) == tag_field::USER_ID) {
+		else if (std::string(azColName[i]) == "USER_ID") {
 			user.setId(std::stoi(argv[i]));
 		}
 	}
@@ -119,9 +119,9 @@ User DatabaseAccess::getTopTaggedUser()
 std::list<Picture> DatabaseAccess::getTaggedPicturesOfUser(const User& user)
 {
 	pictures.clear();
-	std::stringstream statement("SELECT * FROM pictures WHERE id IN (SELECT picture_id FROM tags WHERE user_id = ");
-	statement << user.getId() << ");";
-	my_exec(statement.str().c_str(), pictures_callback);
+	std::string statement = "SELECT * FROM pictures WHERE id IN (SELECT picture_id FROM tags WHERE user_id = ";
+	statement = statement + std::to_string(user.getId()) + ");";
+	my_exec(statement.c_str(), pictures_callback);
 	return pictures;
 }
 
@@ -162,40 +162,37 @@ void DatabaseAccess::clear()
 
 void DatabaseAccess::init_db()
 {
-	std::stringstream statement;
+	std::string statement;
 	//create the users table
-	statement << "CREATE TABLE IF NOT EXISTS USERS (" <<
-		"ID INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL," <<
+	statement = statement + "CREATE TABLE IF NOT EXISTS USERS (" +
+		"ID INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL," +
 		"NAME TEXT NOT NULL);";
-	my_exec(statement.str().c_str());
-	statement.str(std::string());
+	my_exec(statement.c_str());
 	//create the albums table
-	statement << "CREATE TABLE IF NOT EXISTS ALBUMS (" <<
-		"ID INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL," <<
-		"NAME TEXT NOT NULL," <<
-		"CREATION_DATE DATE," <<
-		"USER_ID INTEGER NULL," <<
+	statement = std::string("CREATE TABLE IF NOT EXISTS ALBUMS (") +
+		"ID INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL," +
+		"NAME TEXT NOT NULL," +
+		"CREATION_DATE DATE," +
+		"USER_ID INTEGER NULL," +
 		"FOREIGN KEY(USER_ID) REFERENCES USERS(ID));";
-	my_exec(statement.str().c_str());
-	statement.str(std::string());
+	my_exec(statement.c_str());
 	//create pictures table
-	statement << "CREATE TABLE IF NOT EXISTS PICTURES (" <<
-		"ID INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL," <<
-		"NAME TEXT NOT NULL," <<
-		"LOCATION TEXT NOT NULL," <<
-		"CREATION_DATE TEXT NOT NULL," <<
-		"ALBUM_ID INTEGER NULL," <<
+	statement = std::string("CREATE TABLE IF NOT EXISTS PICTURES (") +
+		"ID INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL," +
+		"NAME TEXT NOT NULL," +
+		"LOCATION TEXT NOT NULL," +
+		"CREATION_DATE TEXT NOT NULL," +
+		"ALBUM_ID INTEGER NULL," +
 		"FOREIGN KEY(ALBUM_ID) REFERENCES ALBUMS(ID));";
-	my_exec(statement.str().c_str());
-	statement.str(std::string());
+	my_exec(statement.c_str());
 	//create tags table
-	statement << "CREATE TABLE IF NOT EXISTS TAGS (" <<
-		"ID INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL," <<
-		"USER_ID INTEGER NULL," <<
-		"PICTURE_ID INTEGER NULL," <<
-		"FOREIGN KEY(USER_ID) REFERENCES USERS(ID)," <<
+	statement = std::string("CREATE TABLE IF NOT EXISTS TAGS (") +
+		"ID INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL," +
+		"USER_ID INTEGER NULL," +
+		"PICTURE_ID INTEGER NULL," +
+		"FOREIGN KEY(USER_ID) REFERENCES USERS(ID)," +
 		"FOREIGN KEY(PICTURE_ID) REFERENCES PICTURES(ID));";
-	my_exec(statement.str().c_str());
+	my_exec(statement.c_str());
 
 }
 
@@ -222,17 +219,17 @@ void DatabaseAccess::my_exec(const char* sqlStatement, int(*callback)(void*, int
 int DatabaseAccess::getNumOfTagsInPic(const int id)
 {
 	pictures.clear();
-	std::stringstream statement("SELECT picture_id FROM tags WHERE id = ");
-	statement << id << ";";
+	std::string statement("SELECT picture_id FROM tags WHERE id = ");
+	statement = statement + std::to_string(id) + ";";
 	return pictures.size();
 }
 
 std::list<Picture> DatabaseAccess::getPicturesInAlbum(const Album& album)
 {
 	pictures.clear();
-	std::stringstream statement("SELECT * FROM pictures WHERE album_id = ");
-	statement << album.getId() << ";";
-	my_exec(statement.str().c_str(), pictures_callback);
+	std::string statement("SELECT * FROM pictures WHERE album_id = ");
+	statement = statement + std::to_string(album.getId()) + ";";
+	my_exec(statement.c_str(), pictures_callback);
 	return pictures;
 }
 
@@ -254,20 +251,20 @@ void DatabaseAccess::printAlbums()
 void DatabaseAccess::addPictureToAlbumByName(const std::string& albumName, const Picture& picture)
 {
 	//insert into pictures (id, name, location, creation_date, album_id)
-	std::stringstream statement;
-	statement << "INSERT INTO pictures (id, name, location, creation_date, album_id) VALUES (" <<
-		picture.getId() << ", '" << picture.getName() << "', '" << picture.getPath() << "', '" <<
-		picture.getCreationDate() << "', " << "(SELECT id FROM albums where NAME = '" << albumName << "'));";
-	my_exec(statement.str().c_str());
+	std::string statement;
+	statement = std::string("INSERT INTO pictures (id, name, location, creation_date, album_id) VALUES (") +
+		std::to_string(picture.getId()) + ", '" + picture.getName() + "', '" + picture.getPath() + "', '" +
+		picture.getCreationDate() + "', " + "(SELECT id FROM albums where NAME = '" + albumName + "'));";
+	my_exec(statement.c_str());
 }
 
 
 void DatabaseAccess::tagUserInPicture(const std::string& albumName, const std::string& pictureName, int userId)
 {
-	std::stringstream statement;
-	statement << "INSERT INTO tags (picture_id, user_id) VALUES((SELECT id FROM pictures WHERE name = '"
-		<< pictureName << "'), " << userId << ");";
-	my_exec(statement.str().c_str());
+	std::string statement;
+	statement = std::string("INSERT INTO tags (picture_id, user_id) VALUES((SELECT id FROM pictures WHERE name = '") +
+		pictureName + "'), " + std::to_string(userId) + ");";
+	my_exec(statement.c_str());
 }
 
 void DatabaseAccess::untagUserInPicture(const std::string& albumName, const std::string& pictureName, int userId)
@@ -289,49 +286,45 @@ void DatabaseAccess::printUsers()
 
 void DatabaseAccess::createUser(User& user)
 {
-	std::stringstream statement;
-	statement << "INSERT INTO users (id, name) VALUES (" <<
-		std::to_string(user.getId()) << ", '" << user.getName() << "');";
-	my_exec(statement.str().c_str());
+	std::string statement;
+	statement = std::string("INSERT INTO users (id, name) VALUES (") +
+		std::to_string(user.getId()) + ", '" + user.getName() + "');";
+	my_exec(statement.c_str());
 }
 
 void DatabaseAccess::deleteUser(const User& user)
 {
 	//delete tags, albums and then user
 	/*first delete user tags*/
-	std::stringstream statement;
-	statement << "DELETE FROM tags WHERE user_id = " << user.getId() << ";";
-	my_exec(statement.str().c_str());
-	statement.str(std::string());
+	std::string statement;
+	statement = std::string("DELETE FROM tags WHERE user_id = ") + std::to_string(user.getId()) + ";";
+	my_exec(statement.c_str());
 	/* next delete pictures in album of user*/
-	statement << "DELETE FROM pictures WHERE album_id IN (SELECT id FROM albums WHERE user_id = " << 
-		user.getId() << ");";
-	my_exec(statement.str().c_str());
-	statement.str(std::string());
+	statement = std::string("DELETE FROM pictures WHERE album_id IN (SELECT id FROM albums WHERE user_id = ") +
+		std::to_string(user.getId()) + ");";
+	my_exec(statement.c_str());
 	/*next delete albums owned by user*/
-	statement << "DELETE FROM albums WHERE user_id = " << user.getId() << ";";
-	my_exec(statement.str().c_str());
-	statement.str(std::string());
+	statement = std::string("DELETE FROM albums WHERE user_id = ") + std::to_string(user.getId()) + ";";
+	my_exec(statement.c_str());
 	/*next delete user from users*/
-	statement << "DELETE FROM users WHERE id = " << user.getId() << ";";
-	my_exec(statement.str().c_str());
+	statement = std::string("DELETE FROM users WHERE id = ") + std::to_string(user.getId()) + ";";
+	my_exec(statement.c_str());
 }
 
 bool DatabaseAccess::doesUserExists(int userId)
 {
 	users.clear();
-	std::stringstream statement("SELECT * FROM users WHERE id = ");
-	statement << userId << ";";
-	my_exec(statement.str().c_str(), users_callback);
+	std::string statement = "SELECT * FROM users WHERE id = " + std::to_string(userId) + ';';
+	my_exec(statement.c_str(), users_callback);
 	return !users.empty();
 }
 
 User DatabaseAccess::getUser(int userId)
 {
 	users.clear();
-	std::stringstream statement("SELECT id, name FROM users WHERE id = ");
-	statement << userId << ";";
-	my_exec(statement.str().c_str(), users_callback);
+	std::string statement("SELECT id, name FROM users WHERE id = ");
+	statement = statement + std::to_string(userId) + ";";
+	my_exec(statement.c_str(), users_callback);
 	if (users.empty()) {
 		throw ItemNotFoundException("User", userId);
 	}
@@ -341,9 +334,9 @@ User DatabaseAccess::getUser(int userId)
 int DatabaseAccess::countAlbumsOwnedOfUser(const User& user)
 {
 	albums.clear();
-	std::stringstream statement("SELECT * FROM albums WHERE user_id = ");
-	statement << user.getId() << ";";
-	my_exec(statement.str().c_str(), albums_callback);
+	std::string statement("SELECT * FROM albums WHERE user_id = ");
+	statement = statement + std::to_string(user.getId()) + ";";
+	my_exec(statement.c_str(), albums_callback);
 	return albums.size();
 }
 
@@ -351,9 +344,9 @@ int DatabaseAccess::countAlbumsTaggedOfUser(const User& user)
 {
 	int res = 0; bool flag = false;
 	pictures.clear();
-	std::stringstream statement("SELECT picture_id FROM tags WHERE user_id = ");
-	statement << user.getId() << ";";
-	my_exec(statement.str().c_str(), tags_callback);
+	std::string statement("SELECT picture_id FROM tags WHERE user_id = ");
+	statement = statement + std::to_string(user.getId()) + ";";
+	my_exec(statement.c_str(), tags_callback);
 	for (const auto& album : getAlbums()) {
 		//go over pictures that user is tagged in
 		for (const auto& pic : pictures) {
@@ -370,8 +363,8 @@ int DatabaseAccess::countAlbumsTaggedOfUser(const User& user)
 int DatabaseAccess::countTagsOfUser(const User& user)
 {
 	users.clear();
-	std::stringstream statement("SELECT user_id FROM tags WHERE user_id = ");
-	statement << user.getId() << ";";
+	std::string statement("SELECT user_id FROM tags WHERE user_id = ");
+	statement = statement + std::to_string(user.getId()) + ";";
 	return users.size();
 }
 
@@ -389,17 +382,17 @@ const std::list<Album> DatabaseAccess::getAlbums()
 const std::list<Album> DatabaseAccess::getAlbumsOfUser(const User& user)
 {
 	albums.clear();
-	std::stringstream statement("SELECT creation_date, name, user_id FROM albums WHERE user_id = ");
-	statement << user.getId() << ";";
-	my_exec(statement.str().c_str(), albums_callback);
+	std::string statement("SELECT creation_date, name, user_id FROM albums WHERE user_id = ");
+	statement = statement + std::to_string(user.getId()) + ";";
+	my_exec(statement.c_str(), albums_callback);
 	return albums;
 }
 
 void DatabaseAccess::createAlbum(const Album& album)
 {
-	std::stringstream statement("INSERT INTO albums (name, creation_date, user_id) VALUES('");
-	statement << album.getName() << "', '" << album.getCreationDate() << "', " << album.getOwnerId() << ");";
-	my_exec(statement.str().c_str());
+	std::string statement = "INSERT INTO albums (name, creation_date, user_id) VALUES('";
+	statement = statement + album.getName() + "', '" + album.getCreationDate() + "', " + std::to_string(album.getOwnerId()) + ");";
+	my_exec(statement.c_str());
 }
 
 void DatabaseAccess::deleteAlbum(const std::string& albumName, int userId)
@@ -415,18 +408,18 @@ void DatabaseAccess::deleteAlbum(const std::string& albumName, int userId)
 bool DatabaseAccess::doesAlbumExists(const std::string& albumName, int userId)
 {
 	albums.clear();
-	std::stringstream statement("SELECT name, user_id FROM albums WHERE name = '");
-	statement << albumName << "' AND user_id = " << userId << ";";
-	my_exec(statement.str().c_str(), albums_callback);
+	std::string statement = "SELECT name, user_id FROM albums WHERE name = '";
+	statement = statement + albumName + "' AND user_id = " + std::to_string(userId) + ';';
+	my_exec(statement.c_str(), albums_callback);
 	return !albums.empty();
 }
 
 Album DatabaseAccess::openAlbum(const std::string& albumName)
 {
 	albums.clear();
-	std::stringstream statement("SELECT * FROM albums WHERE name = '");
-	statement << albumName << "';";
-	my_exec(statement.str().c_str(), albums_callback);
+	std::string statement("SELECT * FROM albums WHERE name = '");
+	statement = statement + albumName + "';";
+	my_exec(statement.c_str(), albums_callback);
 	albums.front().setPictures(getPicturesInAlbum(albums.front()));
 	return albums.front();
 }
@@ -434,14 +427,13 @@ Album DatabaseAccess::openAlbum(const std::string& albumName)
 void DatabaseAccess::removePictureFromAlbumByName(const std::string& albumName, const std::string& pictureName)
 {
 	//first remove tags
-	std::stringstream statement;
-	statement << "DELETE FROM tags WHERE picture_id IN (SELECT id FROM pictures WHERE name = '" <<
-		pictureName << "');";
-	my_exec(statement.str().c_str());
+	std::string statement;
+	statement = statement + "DELETE FROM tags WHERE picture_id IN (SELECT id FROM pictures WHERE name = '" +
+		pictureName + "');";
+	my_exec(statement.c_str());
 	//then pictures
-	statement.str(std::string());
-	statement << "DELETE FROM pictures WHERE name = '" << pictureName << "';";
-	my_exec(statement.str().c_str());
+	statement = std::string("DELETE FROM pictures WHERE name = '") + pictureName + "';";
+	my_exec(statement.c_str());
 }
 
 
