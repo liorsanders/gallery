@@ -109,6 +109,29 @@ void DatabaseAccess::createUser(User& user)
 	my_exec(statement.str().c_str());
 }
 
+void DatabaseAccess::deleteUser(const User& user)
+{
+	//delete tags, albums and then user
+	/*first delete user tags*/
+	std::stringstream statement;
+	statement << "DELETE FROM tags WHERE user_id = " << user.getId() << ";";
+	my_exec(statement.str().c_str());
+	statement.str(std::string());
+	/* next delete pictures in album of user*/
+	statement << "DELETE FROM pictures WHERE album_id IN (SELECT id FROM albums WHERE user_id = " << 
+		user.getId() << ");";
+	my_exec(statement.str().c_str());
+	statement.str(std::string());
+	/*next delete albums owned by user*/
+	statement << "DELETE FROM albums WHERE user_id = " << user.getId() << ";";
+	my_exec(statement.str().c_str());
+	statement.str(std::string());
+
+	/*next delete user from users*/
+	statement << "DELETE FROM users WHERE id = " << user.getId() << ";";
+	my_exec(statement.str().c_str());
+}
+
 void DatabaseAccess::deleteAlbum(const std::string& albumName, int userId)
 {
 	//delete all the pictures in the album 
