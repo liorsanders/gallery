@@ -95,6 +95,12 @@ void DatabaseAccess::tagUserInPicture(const std::string& albumName, const std::s
 	my_exec(statement.str().c_str());
 }
 
+void DatabaseAccess::untagUserInPicture(const std::string& albumName, const std::string& pictureName, int userId)
+{
+	std::string statement = "DELETE FROM tags WHERE user_id = " + std::to_string(userId) + ';';
+	my_exec(statement.c_str());
+}
+
 void DatabaseAccess::createUser(User& user)
 {
 	std::stringstream statement;
