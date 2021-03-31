@@ -75,3 +75,21 @@ void DatabaseAccess::my_exec(const char* sqlStatement)
 		throw std::runtime_error(errMessage);
 	}
 }
+
+void DatabaseAccess::createUser(User& user)
+{
+	std::stringstream statement;
+	statement << "INSERT INTO users (id, name) VALUES (" <<
+		std::to_string(user.getId()) << ", '" << user.getName() << "');";
+	my_exec(statement.str().c_str());
+}
+
+void DatabaseAccess::deleteAlbum(const std::string& albumName, int userId)
+{
+	//delete all the pictures in the album 
+	std::string statement = "DELETE FROM pictures WHERE album_id = (SELECT id FROM albums where NAME = '" + albumName + "');";
+	my_exec(statement.c_str());
+	//now delete the album
+	statement = "DELETE FROM albums WHERE name = '" + albumName + "';";
+	my_exec(statement.c_str());
+}

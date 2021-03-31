@@ -4,6 +4,7 @@
 #include <sstream>
 #include <io.h>
 
+
 constexpr auto DB_NAME = "galleryDB.sqlite";
 
 class DatabaseAccess : public IDataAccess {
@@ -12,7 +13,9 @@ public:
 	const std::list<Album> getAlbums() override;
 	const std::list<Album> getAlbumsOfUser(const User& user) override;
 	void createAlbum(const Album& album) override;
-	void deleteAlbum(const std::string& albumName, int userId) override;
+
+	void deleteAlbum(const std::string& albumName, int userId) override; //TODO
+
 	bool doesAlbumExists(const std::string& albumName, int userId) override;
 	Album openAlbum(const std::string& albumName) override;
 
@@ -21,15 +24,15 @@ public:
 	void printAlbums() override;
 
 	// picture related
-	void addPictureToAlbumByName(const std::string& albumName, const Picture& picture) override;
-	void removePictureFromAlbumByName(const std::string& albumName, const std::string& pictureName) override;
-	void tagUserInPicture(const std::string& albumName, const std::string& pictureName, int userId) override;
-	void untagUserInPicture(const std::string& albumName, const std::string& pictureName, int userId) override;
+	void addPictureToAlbumByName(const std::string& albumName, const Picture& picture) override; //TODO
+	void removePictureFromAlbumByName(const std::string& albumName, const std::string& pictureName) override; //TODO
+	void tagUserInPicture(const std::string& albumName, const std::string& pictureName, int userId) override; //TODO
+	void untagUserInPicture(const std::string& albumName, const std::string& pictureName, int userId) override; //TODO
 	// user related
 	void printUsers() override;
-	void createUser(User& user) override;
+	void createUser(User& user) override; //done
 
-	void deleteUser(const User& user) override;
+	void deleteUser(const User& user) override; //TODO
 	bool doesUserExists(int userId) override;
 	User getUser(int userId) override;
 
@@ -37,7 +40,7 @@ public:
 	int countAlbumsOwnedOfUser(const User& user) override;
 	int countAlbumsTaggedOfUser(const User& user) override;
 	int countTagsOfUser(const User& user) override;
-	float averageTagsPerAlbumOfUser(const User& user) override;
+	float averageTagsPerAlbumOfUser(const User& user) override; //TODO
 	// queries
 	User getTopTaggedUser() override;
 	Picture getTopTaggedPicture() override;
