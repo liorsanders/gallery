@@ -1,4 +1,5 @@
 #include "IDataAccess.h"
+#include "MyException.h"
 #include "sqlite3.h"
 #include <exception>
 #include <sstream>
@@ -36,7 +37,7 @@ namespace picture_field {
 class DatabaseAccess : public IDataAccess {
 public:
 	// album related
-	const std::list<Album> getAlbums() override; //TODO
+	const std::list<Album> getAlbums() override; 
 	const std::list<Album> getAlbumsOfUser(const User& user) override; 
 	void createAlbum(const Album& album) override; 
 
@@ -47,7 +48,7 @@ public:
 
 	void closeAlbum(Album& pAlbum) override {}; ///leaving empty for now
 	
-	void printAlbums() override; //TODO
+	void printAlbums() override; 
 
 	// picture related
 	void addPictureToAlbumByName(const std::string& albumName, const Picture& picture) override; 
@@ -55,7 +56,7 @@ public:
 	void tagUserInPicture(const std::string& albumName, const std::string& pictureName, int userId) override; 
 	void untagUserInPicture(const std::string& albumName, const std::string& pictureName, int userId) override; 
 	// user related
-	void printUsers() override; //TODO
+	void printUsers() override; 
 	void createUser(User& user) override; 
 
 	void deleteUser(const User& user) override; 

@@ -140,6 +140,20 @@ void DatabaseAccess::my_exec(const char* sqlStatement, int(*callback)(void*, int
 	}
 }
 
+void DatabaseAccess::printAlbums()
+{
+	auto all_albums = getAlbums();
+	if (all_albums.empty()) {
+		throw MyException("There are no existing albums.");
+	}
+	std::cout << "Album list:" << std::endl;
+	std::cout << "-----------" << std::endl;
+	for (const Album& album : all_albums) {
+		std::cout << std::setw(5) << "* " << album <<
+			"   * created on " << album.getCreationDate() << std::endl;
+	}
+}
+
 void DatabaseAccess::addPictureToAlbumByName(const std::string& albumName, const Picture& picture)
 {
 	//insert into pictures (id, name, location, creation_date, album_id)
@@ -163,6 +177,17 @@ void DatabaseAccess::untagUserInPicture(const std::string& albumName, const std:
 {
 	std::string statement = "DELETE FROM tags WHERE user_id = " + std::to_string(userId) + ';';
 	my_exec(statement.c_str());
+}
+
+void DatabaseAccess::printUsers()
+{
+	users.clear();
+	my_exec("SELECT * FROM users;", users_callback);
+	std::cout << "Users list:" << std::endl;
+	std::cout << "-----------" << std::endl;
+	for (const auto& user : users) {
+		std::cout << user << std::endl;
+	}
 }
 
 void DatabaseAccess::createUser(User& user)
@@ -234,7 +259,10 @@ int DatabaseAccess::countTagsOfUser(const User& user)
 
 const std::list<Album> DatabaseAccess::getAlbums()
 {
-	//TODO
+	albums.clear();
+	std::string statement("SELECT * FROM albums;");
+	my_exec(statement.c_str(), albums_callback);
+	return albums;
 }
 
 const std::list<Album> DatabaseAccess::getAlbumsOfUser(const User& user)
