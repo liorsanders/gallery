@@ -131,6 +131,15 @@ void DatabaseAccess::my_exec(const char* sqlStatement)
 	}
 }
 
+void DatabaseAccess::my_exec(const char* sqlStatement, int(*callback)(void*, int, char**, char**))
+{
+	char* errMessage = nullptr;
+	int res = sqlite3_exec(_db, sqlStatement, callback, nullptr, &errMessage);
+	if (res != SQLITE_OK) {
+		throw std::runtime_error(errMessage);
+	}
+}
+
 void DatabaseAccess::addPictureToAlbumByName(const std::string& albumName, const Picture& picture)
 {
 	//insert into pictures (id, name, location, creation_date, album_id)
@@ -186,10 +195,62 @@ void DatabaseAccess::deleteUser(const User& user)
 	my_exec(statement.str().c_str());
 }
 
+bool DatabaseAccess::doesUserExists(int userId)
+{
+	users.clear();
+	std::stringstream statement("SELECT * FROM users WHERE id = ");
+	statement << userId << ";";
+	my_exec(statement.str().c_str(), users_callback);
+	return !users.empty();
+}
+
+User DatabaseAccess::getUser(int userId)
+{
+	users.clear();
+	std::stringstream statement("SELECT id, name FROM users WHERE id = ");
+	statement << userId << ";";
+	my_exec(statement.str().c_str(), users_callback);
+	return users.front();
+}
+
+int DatabaseAccess::countAlbumsOwnedOfUser(const User& user)
+{
+	albums.clear();
+	std::stringstream statement("SELECT * FROM albums WHERE user_id = ");
+	statement << user.getId() << ";";
+	my_exec(statement.str().c_str(), albums_callback);
+	return albums.size();
+}
+
+int DatabaseAccess::countAlbumsTaggedOfUser(const User& user)
+{
+	//TODO
+}
+
+int DatabaseAccess::countTagsOfUser(const User& user)
+{
+	//TODO
+}
+
 const std::list<Album> DatabaseAccess::getAlbums()
 {
-	std::list<Album> res;
-	
+	//TODO
+}
+
+const std::list<Album> DatabaseAccess::getAlbumsOfUser(const User& user)
+{
+	albums.clear();
+	std::stringstream statement("SELECT creation_date, name, user_id FROM albums WHERE user_id = ");
+	statement << user.getId() << ";";
+	my_exec(statement.str().c_str(), albums_callback);
+	return albums;
+}
+
+void DatabaseAccess::createAlbum(const Album& album)
+{
+	std::stringstream statement("INSERT INTO albums (name, creation_date, user_id) VALUES('");
+	statement << album.getName() << "', '" << album.getCreationDate() << "', " << album.getOwnerId() << ");";
+	my_exec(statement.str().c_str());
 }
 
 void DatabaseAccess::deleteAlbum(const std::string& albumName, int userId)
@@ -200,6 +261,24 @@ void DatabaseAccess::deleteAlbum(const std::string& albumName, int userId)
 	//now delete the album
 	statement = "DELETE FROM albums WHERE name = '" + albumName + "';";
 	my_exec(statement.c_str());
+}
+
+bool DatabaseAccess::doesAlbumExists(const std::string& albumName, int userId)
+{
+	albums.clear();
+	std::stringstream statement("SELECT name, user_id FROM albums WHERE name = '");
+	statement << albumName << "' AND user_id = " << userId << ";";
+	my_exec(statement.str().c_str(), albums_callback);
+	return !albums.empty();
+}
+
+Album DatabaseAccess::openAlbum(const std::string& albumName)
+{
+	albums.clear();
+	std::stringstream statement("SELECT * FROM albums WHERE name = '");
+	statement << albumName << "';";
+	my_exec(statement.str().c_str(), albums_callback);
+	return albums.front();
 }
 
 void DatabaseAccess::removePictureFromAlbumByName(const std::string& albumName, const std::string& pictureName)

@@ -37,13 +37,13 @@ class DatabaseAccess : public IDataAccess {
 public:
 	// album related
 	const std::list<Album> getAlbums() override; //TODO
-	const std::list<Album> getAlbumsOfUser(const User& user) override; //TODO
-	void createAlbum(const Album& album) override; //TODO
+	const std::list<Album> getAlbumsOfUser(const User& user) override; 
+	void createAlbum(const Album& album) override; 
 
 	void deleteAlbum(const std::string& albumName, int userId) override; 
 
-	bool doesAlbumExists(const std::string& albumName, int userId) override; //TODO
-	Album openAlbum(const std::string& albumName) override; //TODO
+	bool doesAlbumExists(const std::string& albumName, int userId) override; 
+	Album openAlbum(const std::string& albumName) override; 
 
 	void closeAlbum(Album& pAlbum) override {}; ///leaving empty for now
 	
@@ -59,11 +59,11 @@ public:
 	void createUser(User& user) override; 
 
 	void deleteUser(const User& user) override; 
-	bool doesUserExists(int userId) override; //TODO
-	User getUser(int userId) override; //TODO
+	bool doesUserExists(int userId) override; 
+	User getUser(int userId) override; 
 
 	// user statistics
-	int countAlbumsOwnedOfUser(const User& user) override; //TODO
+	int countAlbumsOwnedOfUser(const User& user) override; 
 	int countAlbumsTaggedOfUser(const User& user) override; //TODO
 	int countTagsOfUser(const User& user) override; //TODO
 	float averageTagsPerAlbumOfUser(const User& user) override; 
@@ -80,6 +80,7 @@ public:
 private:
 	void init_db();
 	void my_exec(const char* sqlStatement);
+	void my_exec(const char* sqlStatement, int (*callback)(void*, int, char**, char**));
 
 	sqlite3* _db;
 };
