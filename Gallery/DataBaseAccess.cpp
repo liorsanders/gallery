@@ -1,7 +1,8 @@
 #include "DataBaseAccess.h"
-#include <map>
+#include "ItemNotFoundException.h"
 
-std::list<Album> albums; //get cleared before every query
+//get cleared before every query
+std::list<Album> albums; 
 std::list<User> users;
 std::list<Picture> pictures;
 
@@ -17,6 +18,9 @@ int albums_callback(void* data, int argc, char** argv, char** azColName)
 		}
 		else if (std::string(azColName[i]) == album_field::USER_ID) {
 			album.setOwner(std::stoi(argv[i]));
+		}
+		else if (std::string(azColName[i]) == album_field::ID) {
+			album.setId(std::stoi(argv[i]));
 		}
 	}
 	albums.push_back(album);
@@ -54,6 +58,7 @@ int pictures_callback(void* data, int argc, char** argv, char** azColName)
 		else if (std::string(azColName[i]) == picture_field::LOCATION) {
 			pic.setPath(argv[i]);
 		}
+		
 	}
 	pictures.push_back(pic);
 	return 0;
@@ -148,6 +153,13 @@ void DatabaseAccess::close()
 	_db = nullptr;
 }
 
+void DatabaseAccess::clear()
+{
+	pictures.clear();
+	users.clear();
+	albums.clear();
+}
+
 void DatabaseAccess::init_db()
 {
 	std::stringstream statement;
@@ -214,6 +226,16 @@ int DatabaseAccess::getNumOfTagsInPic(const int id)
 	statement << id << ";";
 	return pictures.size();
 }
+
+std::list<Picture> DatabaseAccess::getPicturesInAlbum(const Album& album)
+{
+	pictures.clear();
+	std::stringstream statement("SELECT * FROM pictures WHERE album_id = ");
+	statement << album.getId() << ";";
+	my_exec(statement.str().c_str(), pictures_callback);
+	return pictures;
+}
+
 
 void DatabaseAccess::printAlbums()
 {
@@ -310,6 +332,9 @@ User DatabaseAccess::getUser(int userId)
 	std::stringstream statement("SELECT id, name FROM users WHERE id = ");
 	statement << userId << ";";
 	my_exec(statement.str().c_str(), users_callback);
+	if (users.empty()) {
+		throw ItemNotFoundException("User", userId);
+	}
 	return users.front();
 }
 
@@ -355,6 +380,9 @@ const std::list<Album> DatabaseAccess::getAlbums()
 	albums.clear();
 	std::string statement("SELECT * FROM albums;");
 	my_exec(statement.c_str(), albums_callback);
+	for (auto it = albums.begin(); it != albums.end(); ++it) {
+		it->setPictures(getPicturesInAlbum(*it));
+	}
 	return albums;
 }
 
@@ -399,6 +427,7 @@ Album DatabaseAccess::openAlbum(const std::string& albumName)
 	std::stringstream statement("SELECT * FROM albums WHERE name = '");
 	statement << albumName << "';";
 	my_exec(statement.str().c_str(), albums_callback);
+	albums.front().setPictures(getPicturesInAlbum(albums.front()));
 	return albums.front();
 }
 

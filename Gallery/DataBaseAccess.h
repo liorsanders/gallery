@@ -75,7 +75,7 @@ public:
 
 	bool open() override;
 	void close() override;
-	void clear() override {};
+	void clear() override;
 	
 
 private:
@@ -83,6 +83,7 @@ private:
 	void my_exec(const char* sqlStatement);
 	void my_exec(const char* sqlStatement, int (*callback)(void*, int, char**, char**));
 	int getNumOfTagsInPic(const int id);
+	std::list<Picture> getPicturesInAlbum(const Album& album);
 
 	sqlite3* _db;
 };

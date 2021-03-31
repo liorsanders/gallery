@@ -27,6 +27,16 @@ void Album::setName(const std::string& name)
 	m_name = name;
 }
 
+int Album::getId() const
+{
+	return _id;
+}
+
+void Album::setId(const int id)
+{
+	_id = id;
+}
+
 int Album::getOwnerId() const
 {
 	return m_ownerId;
