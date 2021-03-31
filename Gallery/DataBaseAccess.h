@@ -32,7 +32,7 @@ public:
 	void printUsers() override;
 	void createUser(User& user) override; 
 
-	void deleteUser(const User& user) override; //TODO
+	void deleteUser(const User& user) override; 
 	bool doesUserExists(int userId) override;
 	User getUser(int userId) override;
 
@@ -40,7 +40,7 @@ public:
 	int countAlbumsOwnedOfUser(const User& user) override;
 	int countAlbumsTaggedOfUser(const User& user) override;
 	int countTagsOfUser(const User& user) override;
-	float averageTagsPerAlbumOfUser(const User& user) override; //TODO
+	float averageTagsPerAlbumOfUser(const User& user) override; 
 	// queries
 	User getTopTaggedUser() override;
 	Picture getTopTaggedPicture() override;

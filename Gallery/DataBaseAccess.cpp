@@ -126,7 +126,6 @@ void DatabaseAccess::deleteUser(const User& user)
 	statement << "DELETE FROM albums WHERE user_id = " << user.getId() << ";";
 	my_exec(statement.str().c_str());
 	statement.str(std::string());
-
 	/*next delete user from users*/
 	statement << "DELETE FROM users WHERE id = " << user.getId() << ";";
 	my_exec(statement.str().c_str());
@@ -154,3 +153,5 @@ void DatabaseAccess::removePictureFromAlbumByName(const std::string& albumName, 
 	statement << "DELETE FROM pictures WHERE name = '" << pictureName << "';";
 	my_exec(statement.str().c_str());
 }
+
+
