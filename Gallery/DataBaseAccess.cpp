@@ -86,6 +86,7 @@ void DatabaseAccess::addPictureToAlbumByName(const std::string& albumName, const
 	my_exec(statement.str().c_str());
 }
 
+
 void DatabaseAccess::tagUserInPicture(const std::string& albumName, const std::string& pictureName, int userId)
 {
 	std::stringstream statement;
@@ -110,4 +111,17 @@ void DatabaseAccess::deleteAlbum(const std::string& albumName, int userId)
 	//now delete the album
 	statement = "DELETE FROM albums WHERE name = '" + albumName + "';";
 	my_exec(statement.c_str());
+}
+
+void DatabaseAccess::removePictureFromAlbumByName(const std::string& albumName, const std::string& pictureName)
+{
+	//first remove tags
+	std::stringstream statement;
+	statement << "DELETE FROM tags WHERE picture_id IN (SELECT id FROM pictures WHERE name = '" <<
+		pictureName << "');";
+	my_exec(statement.str().c_str());
+	//then pictures
+	statement.str(std::string());
+	statement << "DELETE FROM pictures WHERE name = '" << pictureName << "';";
+	my_exec(statement.str().c_str());
 }

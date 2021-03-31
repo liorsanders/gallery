@@ -26,7 +26,7 @@ public:
 	// picture related
 	void addPictureToAlbumByName(const std::string& albumName, const Picture& picture) override; 
 	void removePictureFromAlbumByName(const std::string& albumName, const std::string& pictureName) override; //TODO
-	void tagUserInPicture(const std::string& albumName, const std::string& pictureName, int userId) override; //TODO
+	void tagUserInPicture(const std::string& albumName, const std::string& pictureName, int userId) override; 
 	void untagUserInPicture(const std::string& albumName, const std::string& pictureName, int userId) override; //TODO
 	// user related
 	void printUsers() override;
