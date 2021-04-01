@@ -485,4 +485,3 @@ void DatabaseAccess::removePictureFromAlbumByName(const std::string& albumName, 
 	my_exec(statement.c_str());
 }
 
-
