@@ -1,5 +1,6 @@
 #include "DataBaseAccess.h"
 #include "ItemNotFoundException.h"
+#include <map>
 
 //get cleared before every query
 std::list<Album> albums; 
@@ -82,36 +83,67 @@ int tags_callback(void* data, int argc, char** argv, char** azColName) {
 
 Picture DatabaseAccess::getTopTaggedPicture()
 {
-	int currHighest = -1;
-	Picture currHighestPic;
-	pictures.clear();
-	my_exec("SELECT * FROM pictures;", pictures_callback);
-	int count;
-	for (const auto& pic : pictures) {
-		count = getNumOfTagsInPic(pic.getId());
-		if (count > currHighest) {
-			currHighest = count;
-			currHighestPic = pic;
+	int currentMax = -1;
+	const Picture* mostTaggedPic = nullptr;
+	for (const auto& album : getAlbums()) {
+		for (const Picture& picture : album.getPictures()) {
+			int tagsCount = picture.getTagsCount();
+			if (tagsCount == 0) {
+				continue;
+			}
+
+			if (tagsCount <= currentMax) {
+				continue;
+			}
+
+			mostTaggedPic = &picture;
+			currentMax = tagsCount;
 		}
 	}
-	return currHighestPic;
+	if (nullptr == mostTaggedPic) {
+		throw MyException("There isn't any tagged picture.");
+	}
+
+	return *mostTaggedPic;
 }
 
 User DatabaseAccess::getTopTaggedUser()
 {
-	int currHighest = -1;
-	User currHighestUser;
-	users.clear();
-	my_exec("SELECT * FROM users;", users_callback);
-	int count;
-	for (const auto& user : users) {
-		count = countTagsOfUser(user);
-		if (count > currHighest) {
-			currHighest = count;
-			currHighestUser = user;
+	std::map<int, int> userTagsCountMap;
+	auto all_albums = getAlbums();
+	auto albumsIter = all_albums.begin();
+	for (const auto& album : all_albums) {
+		for (const auto& picture : album.getPictures()) {
+
+			const std::set<int>& userTags = picture.getUserTags();
+			for (const auto& user : userTags) {
+				//As map creates default constructed values, 
+				//users which we haven't yet encountered will start from 0
+				userTagsCountMap[user]++;
+			}
 		}
 	}
-	return currHighestUser;
+
+	if (userTagsCountMap.size() == 0) {
+		throw MyException("There isn't any tagged user.");
+	}
+
+	int topTaggedUser = -1;
+	int currentMax = -1;
+	for (auto entry : userTagsCountMap) {
+		if (entry.second < currentMax) {
+			continue;
+		}
+
+		topTaggedUser = entry.first;
+		currentMax = entry.second;
+	}
+
+	if (-1 == topTaggedUser) {
+		throw MyException("Failed to find most tagged user");
+	}
+
+	return getUser(topTaggedUser);
 }
 
 
@@ -216,12 +248,17 @@ void DatabaseAccess::my_exec(const char* sqlStatement, int(*callback)(void*, int
 	}
 }
 
-int DatabaseAccess::getNumOfTagsInPic(const int id)
+std::list<int> DatabaseAccess::getTagsInPic(const int id)
 {
+	std::list<int> res;
 	pictures.clear();
-	std::string statement("SELECT picture_id FROM tags WHERE id = ");
+	users.clear();
+	std::string statement("SELECT * FROM tags WHERE picture_id = ");
 	statement = statement + std::to_string(id) + ";";
-	return pictures.size();
+	for (const auto& u : users) {
+		res.push_back(u.getId());
+	}
+	return res;
 }
 
 std::list<Picture> DatabaseAccess::getPicturesInAlbum(const Album& album)
@@ -374,7 +411,13 @@ const std::list<Album> DatabaseAccess::getAlbums()
 	std::string statement("SELECT * FROM albums;");
 	my_exec(statement.c_str(), albums_callback);
 	for (auto it = albums.begin(); it != albums.end(); ++it) {
-		it->setPictures(getPicturesInAlbum(*it));
+		auto pics = getPicturesInAlbum(*it);
+		for (auto& p : pics) {
+			for (int val : getTagsInPic(p.getId())) {
+				p.tagUser(val);
+			}
+		}
+		it->setPictures(pics);
 	}
 	return albums;
 }
@@ -420,7 +463,13 @@ Album DatabaseAccess::openAlbum(const std::string& albumName)
 	std::string statement("SELECT * FROM albums WHERE name = '");
 	statement = statement + albumName + "';";
 	my_exec(statement.c_str(), albums_callback);
-	albums.front().setPictures(getPicturesInAlbum(albums.front()));
+	auto pics = getPicturesInAlbum(albums.front());
+	for (auto& p : pics) {
+		for (int val : getTagsInPic(p.getId())) {
+			p.tagUser(val);
+		}
+	}
+	albums.front().setPictures(pics);
 	return albums.front();
 }
 

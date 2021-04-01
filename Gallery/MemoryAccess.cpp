@@ -316,7 +316,7 @@ Picture MemoryAccess::getTopTaggedPicture()
 			if (tagsCount == 0) {
 				continue;
 			}
-
+			
 			if (tagsCount <= currentMax) {
 				continue;
 			}
