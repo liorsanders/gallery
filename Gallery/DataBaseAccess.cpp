@@ -379,7 +379,7 @@ int DatabaseAccess::countAlbumsOwnedOfUser(const User& user)
 
 int DatabaseAccess::countAlbumsTaggedOfUser(const User& user)
 {
-	int res = 0; bool flag = false;
+	int res = 0; bool hasCountedAlbum = false;
 	pictures.clear();
 	std::string statement("SELECT picture_id FROM tags WHERE user_id = ");
 	statement = statement + std::to_string(user.getId()) + ";";
@@ -387,12 +387,12 @@ int DatabaseAccess::countAlbumsTaggedOfUser(const User& user)
 	for (const auto& album : getAlbums()) {
 		//go over pictures that user is tagged in
 		for (const auto& pic : pictures) {
-			if (album.doesPictureExists(pic.getName()) && !flag) {
-				flag = true;
+			if (album.doesPictureExists(pic.getName()) && !hasCountedAlbum) {
+				hasCountedAlbum = true;
 				res++;
 			}
 		}
-		flag = false;
+		hasCountedAlbum = false;
 	}
 	return res;
 }
