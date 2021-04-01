@@ -15,6 +15,14 @@ public:
 	const std::string& getName() const;
 	void setName(const std::string& name);
 
+	int getId() const;
+	void setId(const int id);
+
+	//I added this
+	void setPictures(const std::list<Picture>& pics) {
+		m_pictures = pics;
+	}
+
 	int getOwnerId() const;
 	void setOwner(int userId);
 
@@ -39,6 +47,7 @@ public:
 	friend std::ostream& operator<<(std::ostream& strOut, const Album& album);
 
 private:
+	int _id; //i added this
     int m_ownerId { 0 };
 	std::string m_name;
 	std::string m_creationDate;

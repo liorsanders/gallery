@@ -268,14 +268,14 @@ void AlbumManager::listUserTags()
 	}
 	auto pic = m_openAlbum.getPicture(picName); 
 
-	const std::set<int> users = pic.getUserTags();
+	const std::set<int> usersTags = pic.getUserTags();
 
-	if ( 0 == users.size() )  {
+	if ( 0 == usersTags.size() )  {
 		throw MyException("Error: There is no user tegged in <" + picName + ">.\n");
 	}
 
 	std::cout << "Tagged users in picture <" << picName << ">:" << std::endl;
-	for (const int user_id: users) {
+	for (const int user_id: usersTags) {
 		const User user = m_dataAccess.getUser(user_id);
 		std::cout << user << std::endl;
 	}
@@ -340,7 +340,6 @@ void AlbumManager::userStatistics()
 	if ( !m_dataAccess.doesUserExists(userId) ) {
 		throw MyException("Error: There is no user with id @" + userIdStr + "\n");
 	}
-
 	const User& user = m_dataAccess.getUser(userId);
 
 	std::cout << "user @" << userId << " Statistics:" << std::endl << "--------------------" << std::endl <<

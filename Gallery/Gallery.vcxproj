@@ -88,24 +88,28 @@
     <ClInclude Include="Album.h" />
     <ClInclude Include="AlbumManager.h" />
     <ClInclude Include="AlbumNotOpenException.h" />
+    <ClInclude Include="DataBaseAccess.h" />
     <ClInclude Include="IDataAccess.h" />
     <ClInclude Include="ItemNotFoundException.h" />
     <ClInclude Include="MemoryAccess.h" />
     <ClInclude Include="Constants.h" />
     <ClInclude Include="MyException.h" />
     <ClInclude Include="Picture.h" />
+    <ClInclude Include="sqlite3.h" />
     <ClInclude Include="User.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Album.cpp" />
     <ClCompile Include="AlbumManager.cpp" />
+    <ClCompile Include="DataBaseAccess.cpp" />
     <ClCompile Include="MemoryAccess.cpp" />
     <ClCompile Include="Picture.cpp" />
+    <ClCompile Include="sqlite3.c" />
     <ClCompile Include="User.cpp" />
     <ClCompile Include="Gallery.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Gallery.VC.db" />
+    <Text Include="ReadMe.txt" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
